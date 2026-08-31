@@ -18,8 +18,8 @@ libsay.so: cheer.o grunt.o
 guesser.o: guesser.c say.h
 	$(CC) $(CFLAGS) -c guesser.c -o guesser.o
 
-guesser: guesser.c | libsay.so
-	$(CC) $(LDFLAGS) -o guesser libsay.so guesser.c -lsay
+guesser: guesser.o | libsay.so
+	$(CC) $(LDFLAGS) -o guesser libsay.so guesser.o -lsay
 
 clean:
 	rm -f *.o *.so guesser
