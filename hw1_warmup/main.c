@@ -40,6 +40,7 @@ int main(int argc, char *argv[]) {
             free(result[i]);
         }
         free(result);
+        printf("\n");
     }
 
     return 0;
