@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "my_system.h"
+#include "my_system.c"
 
 int main(int argc, const char *argv[]) {
     int a1 = my_system("sleep 1; echo hi");
