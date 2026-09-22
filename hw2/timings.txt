@@ -1,0 +1,23 @@
+scenario 1: 1.203904 ns
+scenario 2: 6.809786 ns
+scenario 3: 133.333490 ns
+scenario 4: 107170 ns
+secnario 5: 13569 ns
+secnario 6: 382871 ns
+secnario 7: 9006496 ns
+secnario 8: 28309 ns
+
+Each scenario was run on the portal.
+
+For scenarios 1-3, the time comes from the average of 20 trials of
+1000000 scenario calls (thus divided by 1000000). Only these scenarios
+consider measurement overhead because they are much shorter.
+
+For the other scenarios, the time comes from the average of 1000 trials.
+
+Raw data is in "outputX.txt" for X=1-8. The data contains the 20 trial
+times for scenarios 1-3 and the 1000 trial times for 4-8, as well as the
+averages for each scenario.
+
+Timing was consistent enough across trials that a warmup correction
+was not necessary.
