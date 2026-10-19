@@ -1,8 +1,17 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -std=c11
+AR = ar
+ARFLAGS = rcs
 
-test_translate: mlpt.c test_translate.c
-	$(CC) $(CFLAGS) -o test_translate mlpt.c test_translate.c
+all: libmlpt.a
+
+libmlpt.a: mlpt.o
+	$(AR) $(ARFLAGS) libmlpt.a mlpt.o
+
+mlpt.o: mlpt.c mlpt.h config.h
+	$(CC) $(CFLAGS) -c mlpt.c -o mlpt.o
 
 clean:
-	rm -f test_translate
+	rm -f mlpt.o libmlpt.a
+
+.PHONY: all clean
