@@ -53,6 +53,8 @@ size_t translate(size_t va) {
             return ~(size_t) 0;
         }
 
+        // code review: should describe process
+        // 
         if (level < LEVELS - 1) {
             table = (size_t *) (pte & ~OFFSET_MASK);
         }
@@ -91,9 +93,11 @@ int allocate_page(size_t start_va) {
             return 1;
         }
 
-        if ((pte & 1) != 0) {
+        // if valid, continue traversing
+        if ((pte & 1) == 1) {
             table = (size_t *) (pte & ~OFFSET_MASK);
-        } else {
+        }
+        else {
             void *next_table = allocate_zeroed_page();
             table[index] = ((size_t) next_table) | 1;
             table = (size_t *) next_table;
