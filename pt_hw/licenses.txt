@@ -1,0 +1,7 @@
+License options considered:
+
+1. MIT License: This license is fairly permissive, allowing use, modification, and redistribution, including in commercial projects, as long as the copyright and permission notice are retained. It provides a straightforward warranty disclaimer.
+2. GNU General Public License v3.0 (GPL-3.0): This license allows use, modification, and redistribution, but distributed derivative works generally must be made available under GPL-3.0 with source code.
+3. Apache License 2.0: This license has similar permissions to MIT, but it also includes an explicit patent license and more notice requirements.
+
+I chose the MIT License. Since this is a small project, I like the simplicity of the license and its broad permissions on reuse and modification.

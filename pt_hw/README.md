@@ -1,0 +1,27 @@
+# Multi-level Page Table Library
+
+## Build
+
+Run `make` to build `libmlpt.a`. Run `make clean` to remove generated object and library files. The library exports `ptbr`, `translate`, `allocate_page`, `free_page`, and `free_all_pages`; it does not contain a `main` function.
+
+## Configuration
+
+Edit `config.h` before building:
+
+- `LEVELS` selects the number of page-table levels. Supported values are 1 through 6.
+- `POBITS` selects the number of page-offset bits and therefore the page size, `2^POBITS` bytes. Supported values are 4 through 18.
+
+Each page table occupies one page and contains `2^(POBITS - 3)` entries, because each entry is a `size_t` (8 bytes on the target 64-bit platform). The virtual page number is split into `LEVELS` groups of `POBITS - 3` bits. Rebuild after changing `config.h`.
+
+## API
+
+- `translate(va)` returns the physical address corresponding to `va`, preserving its page offset. It returns `SIZE_MAX` (all bits set) if no mapping exists.
+- `allocate_page(start_va)` tries to allocate a page at a page-aligned virtual address. It returns `-1` for a misaligned address, `0` if already mapped, and `1` if it creates a mapping. Newly allocated data pages are initialized to all zeros.
+- `free_page(va)` unmaps and frees the data page containing `va`. The address may be any byte within the mapped page. It returns `1` when it frees a mapped page and `0` if no mapping exists. It does not free now-empty intermediate page tables but retains them for re-use.
+- `free_all_pages()` recursively frees every currently mapped data page and every page-table page, then resets `ptbr` to zero.
+
+The deallocation functions were implemented without changing the behavior or headers of `translate` and `allocate_page`. Do not separately call `free()` on addresses returned by `translate`; use `free_page` or `free_all_pages` instead.
+
+## Limitations
+
+This implementation assumes the assignment's 64-bit system, with the supported `LEVELS` and `POBITS` ranges above. It does not support arbitrary external edits to page-table entries or freeing individual intermediate page tables.

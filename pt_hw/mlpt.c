@@ -13,16 +13,14 @@ size_t ptbr = 0;
 #define ENTRY_COUNT ((size_t) 1 << (POBITS - 3))
 #define OFFSET_MASK (PAGE_SIZE - 1)
 
-//helper function made static
 static size_t index_for_level(size_t va, int level) {
     size_t index_bits = POBITS - 3;
     size_t shift = POBITS + index_bits * (LEVELS - 1 - level);
 
-    // each level uses POBITS - 3 bits of the virtual address.
+    // each level uses POBITS - 3 bits of the virtual address
     return (va >> shift) & (ENTRY_COUNT - 1);
 }
 
-//helper function made static
 static void *allocate_zeroed_page(void) {
     void *page = NULL;
 
@@ -53,13 +51,12 @@ size_t translate(size_t va) {
             return ~(size_t) 0;
         }
 
-        // code review: should describe process
-        // 
         if (level < LEVELS - 1) {
             table = (size_t *) (pte & ~OFFSET_MASK);
         }
     }
 
+    // combine the physical page address with the original virtual page offset
     return (pte & ~OFFSET_MASK) | (va & OFFSET_MASK);
 }
 
@@ -84,7 +81,7 @@ int allocate_page(size_t start_va) {
         pte = table[index];
 
         if (level == LEVELS - 1) {
-            if ((pte & 1) != 0) {
+            if ((pte & 1) == 1) {
                 return 0;
             }
 
@@ -105,4 +102,71 @@ int allocate_page(size_t start_va) {
     }
 
     return -1;
+}
+
+
+int free_page(size_t va) {
+    size_t *table;
+    size_t *leaf_table = NULL;
+    size_t leaf_index = 0;
+    size_t pte;
+
+    if (ptbr == 0) {
+        return 0;
+    }
+
+    table = (size_t *) ptbr;
+
+    for (int level = 0; level < LEVELS; level += 1) {
+        size_t index = index_for_level(va, level);
+
+        pte = table[index];
+        if ((pte & 1) == 0) {
+            return 0;
+        }
+
+        if (level == LEVELS - 1) {
+            leaf_table = table;
+            leaf_index = index;
+        }
+        else {
+            table = (size_t *) (pte & ~OFFSET_MASK);
+        }
+    }
+
+    // leaf entries point to data pages while parent entries point to tables
+    free((void *) (leaf_table[leaf_index] & ~OFFSET_MASK));
+    leaf_table[leaf_index] = 0;
+    return 1;
+}
+
+static void free_table_recursive(size_t *table, int level) {
+    for (size_t index = 0; index < ENTRY_COUNT; index += 1) {
+        size_t pte = table[index];
+
+        // skip invalid entries
+        if ((pte & 1) == 0) {
+            continue;
+        }
+
+        if (level == LEVELS - 1) {
+            free((void *) (pte & ~OFFSET_MASK));
+        }
+        else {
+            size_t *next_table = (size_t *) (pte & ~OFFSET_MASK);
+
+            free_table_recursive(next_table, level + 1);
+            free(next_table);
+        }
+    }
+}
+
+void free_all_pages(void) {
+    if (ptbr == 0) {
+        return;
+    }
+
+    free_table_recursive((size_t *) ptbr, 0);
+    free((void *) ptbr);
+    ptbr = 0;
 }

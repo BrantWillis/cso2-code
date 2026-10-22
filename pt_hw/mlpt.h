@@ -27,3 +27,13 @@ size_t translate(size_t va);
  * setup, the function should not change page tables.)
  */
 int allocate_page(size_t start_va);
+
+/*
+ * Unmap and free the data page containing va.
+ * Returns 1 if a page was freed and 0 if it was not mapped.
+ * Empty page-table pages are retained until free_all_pages().
+ */
+int free_page(size_t va);
+
+/* Free every mapped data page and all page-table pages; reset ptbr to zero. */
+void free_all_pages(void);
