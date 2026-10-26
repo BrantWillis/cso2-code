@@ -1,0 +1,17 @@
+tested using /usr/bin/emacs
+performance of combinations tested (map/reduction):
+original - 30,000,000ns
+(even split/atomic, non-parallel) - 230,000,000ns
+(task queue/openMP built-in) - 260,000,000ns
+(even split/openMP built-in) - 15,000,000ns
+(even split/many-to-few atomic) - 15,000,000ns
+(dynamic schedule/atomic, non-parallel) - 450,000,000ns
+
+I think that an even split map with a many-to-few atomic reduction is
+generally the fastest combination given the data we're processing.
+
+This combination is likely the fastest because we are just processing
+char data, so each thread will take about the same amount of time to
+process and splitting them equally does not cause any issues. Because of
+this, the overhead incurred by other mappings is unnecessary. The
+many-to-few atomic reduction is easy and fast with this mapping.
