@@ -1,5 +1,5 @@
 #include "config.h" /* see pagtable guidance on this file */
-//#include "mlpt.h"   /* see pagetable this file */
+#include "mlpt.h"   /* see pagetable this file */
 
 #include <stddef.h>
 

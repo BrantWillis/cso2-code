@@ -235,7 +235,6 @@ int main(int argc, char *args[]) {
     assert(tlb_peek(0x2101000) == 0);
     assert(tlb_peek(0x2301000) == 1);
     assert(tlb_peek(0x0501000) == 3);
-    //print_all_sets();
     assert(tlb_peek(0x0801000) == 4);
     assert(tlb_peek(0x0A01000) == 2);
     for (int i = 0; i < 16; i += 1) {
