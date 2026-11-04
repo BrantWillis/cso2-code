@@ -43,12 +43,11 @@ typedef void (*vfv)(void);
 /** Array of function pointers to test and time */
 vfv test_functions[] = {
     serial,
-    /* UNCOMMENT THIS WHEN YOU'VE IMPLEMENTED PARALLEL VERSION
+    ///* UNCOMMENT THIS WHEN YOU'VE IMPLEMENTED PARALLEL VERSION
     threads_1,
     threads_2,
     threads_4,
-    threads_8,
-    */
+    threads_8
 };
 /** Display names for functions (must match above array) */
 const char *function_names[] = {
@@ -148,9 +147,13 @@ int main(int argc, const char **argv) {
     }
     
     target_board = LB_clone(original_board);
+    //puts("what");
+    //simulate_life_parallel(2, target_board, iterations);
     simulate_life_serial(target_board, iterations);
     if (show_result)
         LB_display(target_board, stdout);
+
+    //exit(0);
     
     int exit_code = 0;
     if (do_timings) {
