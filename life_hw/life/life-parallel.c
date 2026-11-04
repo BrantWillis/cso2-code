@@ -1,8 +1,6 @@
 #include "life.h"
 #include <pthread.h>
 
-pthread_barrier_t barrier;
-
 typedef struct {
     LifeBoard *state;
     LifeBoard *next_state;
@@ -10,10 +8,13 @@ typedef struct {
     int v_stop;
     int steps;
     int first;
+    pthread_barrier_t *barrier;
 } ThreadArg;
 
 void *simulate_partition(void *args) {
     ThreadArg *thread_args = (ThreadArg *)args;
+
+    pthread_barrier_t *barrier = thread_args->barrier;
 
     LifeBoard *state = thread_args->state;
     LifeBoard *next_state = thread_args->next_state;
@@ -44,11 +45,11 @@ void *simulate_partition(void *args) {
         }
         
         //first thread designated to do board swap
-        pthread_barrier_wait(&barrier);
+        pthread_barrier_wait(barrier);
         if (thread_args->first == 1) {
             LB_swap(state, next_state);
         }
-        pthread_barrier_wait(&barrier);
+        pthread_barrier_wait(barrier);
     }
 
     void *ans = NULL;
@@ -56,6 +57,8 @@ void *simulate_partition(void *args) {
 }
 
 void simulate_life_parallel(int threads, LifeBoard *state, int steps) {
+    pthread_barrier_t barrier;
+
     LifeBoard *next_state = LB_new(state->width, state->height);
     pthread_barrier_init(&barrier, NULL, threads);
 
@@ -70,7 +73,8 @@ void simulate_life_parallel(int threads, LifeBoard *state, int steps) {
             .v_start = 1 + i * (state->height - 2) / threads,
             .v_stop = 1 + (i + 1) * (state->height - 2) / threads,
             .steps = steps,
-            .first = !i //i=0 is the first thread (will perform swaps)
+            .first = !i, //i=0 is the first thread (will perform swaps)
+            .barrier = &barrier
         };
         tasks[i] = arg;
         pthread_create(&id[i], NULL, simulate_partition, &tasks[i]);
